@@ -9,6 +9,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,8 +19,8 @@ import fr.canm.cyrilstern1.threadcnamtp6.tacheAsynk.AsynkTaskLoad;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     public static Integer DO_THREAD;
-    public static ArrayAdapter arrayAdapter;
-    private static List <String> cantonList = new ArrayList<>();
+    public static CantonArrayAdapter arrayAdapter;
+    private static List <Canton> cantonList = new ArrayList<>();
     public  static ListView listCanon;
     private ProgressBar progressBar;
     private TextView tv;
@@ -27,6 +29,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonContinue;
     private AsynkTaskLoad asynk;
     private  Integer line =0;
+    private Canton canton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         progressBar = (ProgressBar) findViewById(R.id.progressBarId);
         tv = (TextView) findViewById(R.id.progressionText);
         listCanon.setAdapter(arrayAdapter);
-        arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,cantonList);
+        arrayAdapter = new CantonArrayAdapter(this,R.layout.activity_main, (ArrayList<Canton>) cantonList);
         listCanon.setAdapter(arrayAdapter);
     }
 
@@ -66,8 +69,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onSaveInstanceState(Bundle savedState) {
 
         super.onSaveInstanceState(savedState);
-        List ar = cantonList;
-        savedState.putStringArrayList("myKey", (ArrayList<String>) ar);
+        List <Canton> ar = cantonList;
+        savedState.putSerializable("myKey", (Serializable) ar);
         if(asynk != null){
          asynk.cancel(true);
         }
@@ -81,10 +84,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             buttonStop.setEnabled(tabButton[2]);
             buttonLoad.setEnabled(tabButton[1]);
             buttonContinue.setEnabled(tabButton[0]);
-            ArrayList<Parcelable> liste = new ArrayList<>(savedInstanceState.getParcelableArrayList("myKey"));
+            ArrayList<Canton> liste = (ArrayList<Canton>) savedInstanceState.getSerializable("myKey");
             if (liste != null) {
                 listCanon = (ListView) findViewById(R.id.lsitCanton);
-                arrayAdapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,liste);
+                arrayAdapter = new CantonArrayAdapter(this,R.layout.activity_main,liste);
                 listCanon.setAdapter(arrayAdapter);
             }
         super.onRestoreInstanceState(savedInstanceState);

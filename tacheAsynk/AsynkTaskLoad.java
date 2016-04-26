@@ -15,7 +15,10 @@ import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.canm.cyrilstern1.threadcnamtp6.Canton;
+import fr.canm.cyrilstern1.threadcnamtp6.CantonArrayAdapter;
 import fr.canm.cyrilstern1.threadcnamtp6.MainActivity;
+import fr.canm.cyrilstern1.threadcnamtp6.R;
 
 /**
  * Created by cyrilstern1 on 08/04/2016.
@@ -23,24 +26,26 @@ import fr.canm.cyrilstern1.threadcnamtp6.MainActivity;
 public  class AsynkTaskLoad extends AsyncTask <List<String>, String, List> {
 
     private Context mContext;
-    private List <String> cityList;
+    private Canton canton;
+    private List <Canton> cityList;
     public ProgressBar progressBar;
-    public static List<String> listCanton;
-    public ArrayAdapter aaList;
+    public static List<Canton> listCanton;
+    public CantonArrayAdapter aaList;
     public TextView tv;
     public int total;
     public int intLu;
     private String s;
 
 
-    public AsynkTaskLoad (Context context, ListView lv, ProgressBar progressBar, ArrayAdapter arrayAdapter,List list, TextView text, Integer line){
+    public AsynkTaskLoad (Context context, ListView lv, ProgressBar progressBar, CantonArrayAdapter arrayAdapter,List<Canton> list, TextView text, Integer line){
 
+        this.aaList = arrayAdapter;
         this.mContext = context;
         this.progressBar = progressBar;
         this.cityList = list;
         this.tv =text;
         this.intLu = line;
-        aaList = new ArrayAdapter(mContext,android.R.layout.simple_list_item_1,cityList);
+        aaList = new CantonArrayAdapter(mContext, R.layout.cantonrow, (ArrayList<Canton>) cityList);
     }
     public static List getList(){
         if(listCanton!=null){return listCanton;}
@@ -82,7 +87,8 @@ public  class AsynkTaskLoad extends AsyncTask <List<String>, String, List> {
 
                     MainActivity.setLine(intLu);
                     float percentage = ((float)intLu / (float)total) * total;
-                    publishProgress(array[8] + array[9]);
+                    publishProgress(array[8] , array[9]);
+                    aaList.notifyDataSetChanged();
                    // publishProgress(new Float(percentage).intValue());
 
                 }
@@ -98,11 +104,18 @@ public  class AsynkTaskLoad extends AsyncTask <List<String>, String, List> {
         }
 
         protected void onProgressUpdate(String... progress) {
-            cityList.add(progress[0]);
-            MainActivity.setLine(intLu);
+            if (progress[0] != null){
+                canton = new Canton(progress[0],progress[1]);
+
+            cityList.add(canton);
+                aaList.notifyDataSetChanged();
+
+                MainActivity.setLine(intLu);
             float percentage = ((float)intLu / (float)total) * total;
             progressBar.setProgress((int) percentage);
             tv.setText("chargement en cours..." +intLu+"/"+total);
+
+            }
 
         }
 
